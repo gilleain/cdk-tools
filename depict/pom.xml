@@ -6,4 +6,65 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>depict</artifactId>
+  
+  <build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>tools.depict.App</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+     <dependency>
+        <groupId>org.openscience.cdk</groupId>
+        <artifactId>cdk-sdg</artifactId>
+        <version>${cdk.version}</version>
+     </dependency>
+	<dependency>
+	    <groupId>org.openscience.cdk</groupId>
+	    <artifactId>cdk-render</artifactId>
+	    <version>${cdk.version}</version>
+	 </dependency>
+	 <dependency>
+        <groupId>org.openscience.cdk</groupId>
+        <artifactId>cdk-renderbasic</artifactId>
+        <version>${cdk.version}</version>
+     </dependency>
+     <dependency>
+        <groupId>org.openscience.cdk</groupId>
+        <artifactId>cdk-renderawt</artifactId>
+        <version>${cdk.version}</version>
+     </dependency>
+	<dependency>
+        <groupId>org.openscience.cdk</groupId>
+        <artifactId>cdk-smiles</artifactId>
+        <version>${cdk.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.openscience.cdk</groupId>
+        <artifactId>cdk-data</artifactId>
+        <version>${cdk.version}</version>
+    </dependency>
+  </dependencies>
 </project>
