@@ -21,6 +21,7 @@
   <modules>
   	<module>io</module>
   	<module>depict</module>
+  	<module>core</module>
   </modules>
   
    <dependencies>
