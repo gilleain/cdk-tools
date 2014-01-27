@@ -1,5 +1,6 @@
 package tools.io;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,6 +15,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
+import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 /**
@@ -65,8 +67,19 @@ public class App {
 			if (inputAtomContainers != null) {
 				if (outputFormat.equals("SMI")) {
 					try {
-						FileWriter writer = new FileWriter(new File(outputFilename));
+						BufferedWriter writer = new BufferedWriter(
+								new FileWriter(new File(outputFilename)));
+						SmilesGenerator smilesGenerator = SmilesGenerator.unique();
+						for (IAtomContainer atomContainer : inputAtomContainers) {
+							String smiles = smilesGenerator.create(atomContainer);
+							writer.write(smiles);
+							writer.newLine();
+							writer.flush();
+						}
+						writer.close();
 					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (CDKException e) {
 						e.printStackTrace();
 					}
 				}
