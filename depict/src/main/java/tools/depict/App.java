@@ -1,5 +1,6 @@
 package tools.depict;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -25,6 +26,7 @@ import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.IRenderer;
+import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
@@ -117,13 +119,17 @@ public class App {
 	}
 	
 	private static Image draw(IAtomContainer atomContainer) {
-		int w = 1000;
-		int h = 1000;
+		int w = 500;
+		int h = 500;
 		List<IGenerator<IAtomContainer>> generators = makeGenerators();
 		IRenderer<IAtomContainer> atomContainerRenderer = 
 				new AtomContainerRenderer(generators, new AWTFontManager());
+		RendererModel model = atomContainerRenderer.getRenderer2DModel();
+		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
 		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics graphics = image.getGraphics();
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, w, h);
 		atomContainerRenderer.setup(atomContainer, new Rectangle(w, h));
 		atomContainerRenderer.paint(atomContainer, new AWTDrawVisitor((Graphics2D) graphics));
 		graphics.dispose();
