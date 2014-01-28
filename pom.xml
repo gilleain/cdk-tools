@@ -19,7 +19,7 @@
 
   
   <modules>
-  	<module>io</module>
+  	<module>convert</module>
   	<module>depict</module>
   	<module>core</module>
   </modules>

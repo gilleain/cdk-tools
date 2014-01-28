@@ -5,7 +5,7 @@
     <artifactId>cdk-tools</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>io</artifactId>
+  <artifactId>convert</artifactId>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,7 +20,7 @@
   			<configuration>
   				<archive>
   					<manifest>
-  						<mainClass>tools.io.App</mainClass>
+  						<mainClass>tools.convert.App</mainClass>
   					</manifest>
   				</archive>
   				<descriptorRefs>
