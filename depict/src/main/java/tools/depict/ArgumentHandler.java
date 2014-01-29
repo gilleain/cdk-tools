@@ -22,6 +22,7 @@ public class ArgumentHandler extends BaseArgumentHandler {
 		options.addOption(
 				OptionBuilder.hasOptionalArgs(2)
 							 .withDescription("Image Properties")
+							 .withValueSeparator()
 							 .withArgName("option=value")
 							 .create('P'));
 		
@@ -34,6 +35,8 @@ public class ArgumentHandler extends BaseArgumentHandler {
 			} else {
 				setImageProperties(optionProperties);
 			}
+		} else {
+			setImageProperties(new Properties());
 		}
 	}
 	

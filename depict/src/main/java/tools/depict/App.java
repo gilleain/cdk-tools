@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -32,6 +33,7 @@ import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.generators.IGeneratorParameter;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
@@ -86,7 +88,7 @@ public class App {
 					try {
 						for (IAtomContainer atomContainer : inputAtomContainers) {
 							atomContainer = makeDiagram(atomContainer);
-							Image image = draw(atomContainer);
+							Image image = draw(atomContainer, arguments);
 							ImageIO.write(
 									(RenderedImage) image, "PNG", new File(outputFilename));
 						}
@@ -118,12 +120,57 @@ public class App {
 		return resultMolecule;
 	}
 	
-	private static Image draw(IAtomContainer atomContainer) {
+	@SuppressWarnings("rawtypes")
+	private static void applyParameters(
+			List<IGenerator<IAtomContainer>> generators, Properties properties) {
+		if (properties.isEmpty()) {
+			return;
+		} else {
+			for (IGenerator generator : generators) {
+				for (Object parameterObj : generator.getParameters()) {
+					IGeneratorParameter parameter = (IGeneratorParameter) parameterObj;
+					for (String key : properties.stringPropertyNames()) {
+						String dollarKey = key.replace(".", "$");
+						String className = parameter.getClass().getName();
+						String simpleName = parameter.getClass().getSimpleName();
+						String baseClassName = className.substring(className.lastIndexOf('.') + 1);
+						System.out.println(key + ", " + className + ", " + baseClassName + ", " + simpleName);
+						if (baseClassName.equals(dollarKey)) {
+							String value = properties.getProperty(key);
+							setParameter(value, parameter);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void setParameter(String valueString, IGeneratorParameter parameter) {
+		Class parameterClass = parameter.getDefault().getClass();
+		if (parameterClass == String.class) {
+			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
+			parameter.setValue(valueString);
+		} else if (parameterClass == Color.class) {
+			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
+			parameter.setValue(Color.getColor(valueString));
+		} else if (parameterClass == Integer.class) {
+			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
+			parameter.setValue(Integer.parseInt(valueString));
+		} else if (parameterClass == Boolean.class) {
+			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
+			parameter.setValue(Boolean.parseBoolean(valueString));
+		}
+	}
+	
+	private static Image draw(IAtomContainer atomContainer, ArgumentHandler arguments) {
 		int w = 500;
 		int h = 500;
 		List<IGenerator<IAtomContainer>> generators = makeGenerators();
 		IRenderer<IAtomContainer> atomContainerRenderer = 
 				new AtomContainerRenderer(generators, new AWTFontManager());
+		Properties properties = arguments.getImageProperties();
+		applyParameters(atomContainerRenderer.getGenerators(), properties);
 		RendererModel model = atomContainerRenderer.getRenderer2DModel();
 		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
 		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
