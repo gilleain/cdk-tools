@@ -42,11 +42,6 @@
 
   <dependencies>
    <dependency>
-        <groupId>org.openscience.cdk-tools</groupId>
-        <artifactId>core</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-   </dependency>
-   <dependency>
         <groupId>org.openscience.cdk</groupId>
         <artifactId>cdk-io</artifactId>
         <version>${cdk.version}</version>
@@ -61,6 +56,10 @@
         <artifactId>cdk-data</artifactId>
         <version>${cdk.version}</version>
     </dependency>
-
+    <dependency>
+        <groupId>org.openscience.cdk-tools</groupId>
+        <artifactId>core</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>

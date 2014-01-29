@@ -1,91 +1,56 @@
 package tools.depict;
 
+import java.util.Properties;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 
-public class ArgumentHandler {
-	
-	private final Options options;
-	
-	private String inputFormat;
-	
-	private String outputFormat;
-	
-	private String inputFilename;
-	
-	private String outputFilename;
+import tools.core.BaseArgumentHandler;
 
+public class ArgumentHandler extends BaseArgumentHandler {
+	
+	private Properties imageProperties;
+	
+	private boolean isImagePropertiesHelp;
+	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
-		options = new Options();
-		options.addOption("h", "help", false, "Command usage");
+		super(args);
+		Options options = super.getOptions();
 		options.addOption(
-			OptionBuilder.hasArg().withArgName("type").withDescription("Input type").create('i'));
-		options.addOption(
-			OptionBuilder.hasArg().withArgName("type").withDescription("Output type").create('o'));
-		options.addOption(
-			OptionBuilder.hasArg().withArgName("filepath").withDescription("Input filename").create('I'));
-		options.addOption(
-			OptionBuilder.hasArg().withArgName("filepath").withDescription("Output filename").create('O'));
+				OptionBuilder.hasOptionalArgs(2)
+							 .withDescription("Image Properties")
+							 .withArgName("option=value")
+							 .create('P'));
 		
-		PosixParser parser = new PosixParser();
-		boolean stopAtNonOption = true;
-		CommandLine line = parser.parse(options, args, stopAtNonOption);
+		CommandLine commandLine = super.parse(args);
 		
-		if (line.hasOption('i')) {
-			inputFormat = line.getOptionValue('i');
+		if (commandLine.hasOption('P')) {
+			Properties optionProperties = commandLine.getOptionProperties("P"); 
+			if (optionProperties.isEmpty()) {
+				setImagePropertiesHelp(true);
+			} else {
+				setImageProperties(optionProperties);
+			}
 		}
-		
-		if (line.hasOption('o')) {
-			outputFormat = line.getOptionValue('o');
-		}
-		
-		if (line.hasOption('I')) {
-			inputFilename = line.getOptionValue('I');
-		}
-		
-		if (line.hasOption('O')) {
-			outputFilename = line.getOptionValue('O');
-		}
-	}
-
-	public String getInputFormat() {
-		return inputFormat;
-	}
-
-	public void setInputFormat(String inputFormat) {
-		this.inputFormat = inputFormat;
-	}
-
-	public String getOutputFormat() {
-		return outputFormat;
-	}
-
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
 	}
 	
-	public void missingInputFilename() {
-		System.err.println("Please supply an input filename with -I");
+	public void setImageProperties(Properties imageProperties) {
+		this.imageProperties = imageProperties;
+	}
+	
+	public Properties getImageProperties() {
+		return this.imageProperties;
 	}
 
-	public String getInputFilename() {
-		return inputFilename;
+	public boolean isImagePropertiesHelp() {
+		return isImagePropertiesHelp;
 	}
 
-	public void setInputFilename(String inputFilename) {
-		this.inputFilename = inputFilename;
-	}
-
-	public String getOutputFilename() {
-		return outputFilename;
-	}
-
-	public void setOutputFilename(String outputFilename) {
-		this.outputFilename = outputFilename;
+	public void setImagePropertiesHelp(boolean isImagePropertiesHelp) {
+		this.isImagePropertiesHelp = isImagePropertiesHelp;
 	}
 
 }
