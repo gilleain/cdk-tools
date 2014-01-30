@@ -35,12 +35,21 @@ public class HighlightGenerator implements IGenerator<IAtomContainer> {
         }
     }
 	private AtomHighlightRadius atomHighlightRadius = new AtomHighlightRadius();
+	
+	public static class AtomHighlightFill extends AbstractGeneratorParameter<Boolean> {
+    	/** Returns the default value. **/
+        public Boolean getDefault() {
+            return true;
+        }
+    }
+	private AtomHighlightFill atomHighlightFill = new AtomHighlightFill();
 
 	public List<IGeneratorParameter<?>> getParameters() {
 		 return Arrays.asList(
 	                new IGeneratorParameter<?>[] {
 	                	atomHighlightColor,
-	                	atomHighlightRadius
+	                	atomHighlightRadius,
+	                	atomHighlightFill
 	                }
 		);
 	}
@@ -54,7 +63,8 @@ public class HighlightGenerator implements IGenerator<IAtomContainer> {
 						model.get(AtomHighlightRadius.class) /
 				        model.getParameter(Scale.class).getValue();
 				Color color = model.get(AtomHighlightColor.class);
-				elements.add(new OvalElement(p.x, p.y, radius, color));
+				boolean fill = model.get(AtomHighlightFill.class);
+				elements.add(new OvalElement(p.x, p.y, radius, fill, color));
 			}
 		}
 		return elements;
