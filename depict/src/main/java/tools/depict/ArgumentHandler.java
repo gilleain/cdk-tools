@@ -3,6 +3,8 @@ package tools.depict;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -20,6 +22,8 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	
 	private boolean isImagePropertiesHelp;
 	
+	private List<Integer> matchedAtoms;
+	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
 		super(args);
@@ -34,6 +38,11 @@ public class ArgumentHandler extends BaseArgumentHandler {
 				OptionBuilder.hasArg()
 							 .withArgName("image properties file")
 							 .create('p'));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withArgName("matched atoms")
+							 .create('m'));
 		
 		CommandLine commandLine = super.parse(args);
 		
@@ -64,6 +73,23 @@ public class ArgumentHandler extends BaseArgumentHandler {
 				throw new ParseException("Properties file I/O error " + propertiesFilename);
 			}
 		}
+		
+		if (commandLine.hasOption('m')) {
+			String matchList = commandLine.getOptionValue('m');
+			String[] stringList = matchList.split(",");
+			matchedAtoms = new ArrayList<Integer>();
+			try {
+				for (String stringPart : stringList) {
+					int match = Integer.parseInt(stringPart);
+					matchedAtoms.add(match);
+					System.out.println("adding match " + match);
+				}
+			} catch (NumberFormatException nfe) {
+				throw new ParseException("Match string invalid " + matchList);
+			}
+		} else {
+			setMatchedAtoms(new ArrayList<Integer>());
+		}
 	}
 	
 	public void setImageProperties(Properties imageProperties) {
@@ -88,6 +114,14 @@ public class ArgumentHandler extends BaseArgumentHandler {
 
 	public void setImagePropertiesFile(String imagePropertiesFile) {
 		this.imagePropertiesFile = imagePropertiesFile;
+	}
+
+	public List<Integer> getMatchedAtoms() {
+		return matchedAtoms;
+	}
+
+	public void setMatchedAtoms(List<Integer> matchedAtoms) {
+		this.matchedAtoms = matchedAtoms;
 	}
 
 }

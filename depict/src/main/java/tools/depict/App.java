@@ -95,6 +95,10 @@ public class App {
 				if (outputFormat.equals("PNG")) {
 					try {
 						for (IAtomContainer atomContainer : inputAtomContainers) {
+							
+							// XXX - this highlights all the containers with the same matches!
+							highlightAtoms(atomContainer, arguments.getMatchedAtoms());
+							
 							atomContainer = makeDiagram(atomContainer);
 							IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(
 									generators, new AWTFontManager());
@@ -114,11 +118,21 @@ public class App {
 		}
 	}
 	
+	private static void highlightAtoms(IAtomContainer atomContainer, List<Integer> matches) {
+		int maxIndex = atomContainer.getAtomCount() - 1;
+		for (int match : matches) {
+			if (maxIndex > match) {	// TODO ... else?
+				atomContainer.getAtom(match).setProperty("HIGHLIGHT", true);
+			}
+		}
+	}
+	
 	private static List<IGenerator<IAtomContainer>> makeGenerators() {
 		List<IGenerator<IAtomContainer>> generators = new ArrayList<IGenerator<IAtomContainer>>();
 		generators.add(new BasicSceneGenerator());
 		generators.add(new BasicBondGenerator());
 		generators.add(new BasicAtomGenerator());
+		generators.add(new HighlightGenerator());
 		return generators;
 	}
 	
