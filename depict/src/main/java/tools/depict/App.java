@@ -13,7 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -51,6 +51,14 @@ public class App {
 	public static void main(String[] args) {
 		try {
 			ArgumentHandler arguments = new ArgumentHandler(args);
+			
+			// verify any generator parameters as early as possible
+			List<IGenerator<IAtomContainer>> generators = makeGenerators();
+			@SuppressWarnings("rawtypes")
+			Map<String, IGeneratorParameter> parameterNameMap = 
+					ParameterHandler.getParamNameMap(generators);
+			ParameterHandler.applyParameters(parameterNameMap, arguments.getImageProperties());
+			
 			String inputFormat = arguments.getInputFormat();
 			String outputFormat = arguments.getOutputFormat();
 			
@@ -88,7 +96,9 @@ public class App {
 					try {
 						for (IAtomContainer atomContainer : inputAtomContainers) {
 							atomContainer = makeDiagram(atomContainer);
-							Image image = draw(atomContainer, arguments);
+							IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(
+									generators, new AWTFontManager());
+							Image image = draw(atomContainer, renderer, arguments);
 							ImageIO.write(
 									(RenderedImage) image, "PNG", new File(outputFilename));
 						}
@@ -120,65 +130,21 @@ public class App {
 		return resultMolecule;
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private static void applyParameters(
-			List<IGenerator<IAtomContainer>> generators, Properties properties) {
-		if (properties.isEmpty()) {
-			return;
-		} else {
-			for (IGenerator generator : generators) {
-				for (Object parameterObj : generator.getParameters()) {
-					IGeneratorParameter parameter = (IGeneratorParameter) parameterObj;
-					for (String key : properties.stringPropertyNames()) {
-						String dollarKey = key.replace(".", "$");
-						String className = parameter.getClass().getName();
-						String simpleName = parameter.getClass().getSimpleName();
-						String baseClassName = className.substring(className.lastIndexOf('.') + 1);
-						System.out.println(key + ", " + className + ", " + baseClassName + ", " + simpleName);
-						if (baseClassName.equals(dollarKey)) {
-							String value = properties.getProperty(key);
-							setParameter(value, parameter);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void setParameter(String valueString, IGeneratorParameter parameter) {
-		Class parameterClass = parameter.getDefault().getClass();
-		if (parameterClass == String.class) {
-			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
-			parameter.setValue(valueString);
-		} else if (parameterClass == Color.class) {
-			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
-			parameter.setValue(Color.getColor(valueString));
-		} else if (parameterClass == Integer.class) {
-			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
-			parameter.setValue(Integer.parseInt(valueString));
-		} else if (parameterClass == Boolean.class) {
-			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
-			parameter.setValue(Boolean.parseBoolean(valueString));
-		}
-	}
-	
-	private static Image draw(IAtomContainer atomContainer, ArgumentHandler arguments) {
+	private static Image draw(IAtomContainer atomContainer, 
+							  IRenderer<IAtomContainer> renderer,
+							  ArgumentHandler arguments) {
 		int w = 500;
 		int h = 500;
-		List<IGenerator<IAtomContainer>> generators = makeGenerators();
-		IRenderer<IAtomContainer> atomContainerRenderer = 
-				new AtomContainerRenderer(generators, new AWTFontManager());
-		Properties properties = arguments.getImageProperties();
-		applyParameters(atomContainerRenderer.getGenerators(), properties);
-		RendererModel model = atomContainerRenderer.getRenderer2DModel();
+		
+		
+		RendererModel model = renderer.getRenderer2DModel();
 		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
 		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics graphics = image.getGraphics();
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, w, h);
-		atomContainerRenderer.setup(atomContainer, new Rectangle(w, h));
-		atomContainerRenderer.paint(atomContainer, new AWTDrawVisitor((Graphics2D) graphics));
+		renderer.setup(atomContainer, new Rectangle(w, h));
+		renderer.paint(atomContainer, new AWTDrawVisitor((Graphics2D) graphics));
 		graphics.dispose();
 		return image;
 	}
