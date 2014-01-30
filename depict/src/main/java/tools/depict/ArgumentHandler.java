@@ -1,5 +1,8 @@
 package tools.depict;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -13,6 +16,8 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	
 	private Properties imageProperties;
 	
+	private String imagePropertiesFile;
+	
 	private boolean isImagePropertiesHelp;
 	
 	@SuppressWarnings("static-access")
@@ -25,6 +30,10 @@ public class ArgumentHandler extends BaseArgumentHandler {
 							 .withValueSeparator()
 							 .withArgName("option=value")
 							 .create('P'));
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withArgName("image properties file")
+							 .create('p'));
 		
 		CommandLine commandLine = super.parse(args);
 		
@@ -37,6 +46,23 @@ public class ArgumentHandler extends BaseArgumentHandler {
 			}
 		} else {
 			setImageProperties(new Properties());
+		}
+		
+		if (commandLine.hasOption('p')) {
+			String propertiesFilename = commandLine.getOptionValue('p');
+			Properties propertiesFromFile = new Properties();
+			try {
+				FileInputStream input = new FileInputStream(propertiesFilename);
+				propertiesFromFile.load(input);
+				for (String property : propertiesFromFile.stringPropertyNames()) {
+					imageProperties.put(property, propertiesFromFile.get(property));
+				}
+				input.close();
+			} catch (FileNotFoundException fnf) {
+				throw new ParseException("Properties file not found " + propertiesFilename);
+			} catch (IOException e) {
+				throw new ParseException("Properties file I/O error " + propertiesFilename);
+			}
 		}
 	}
 	
@@ -54,6 +80,14 @@ public class ArgumentHandler extends BaseArgumentHandler {
 
 	public void setImagePropertiesHelp(boolean isImagePropertiesHelp) {
 		this.isImagePropertiesHelp = isImagePropertiesHelp;
+	}
+	
+	public String getImagePropertiesFile() {
+		return imagePropertiesFile;
+	}
+
+	public void setImagePropertiesFile(String imagePropertiesFile) {
+		this.imagePropertiesFile = imagePropertiesFile;
 	}
 
 }

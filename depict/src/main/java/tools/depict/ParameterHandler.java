@@ -111,6 +111,9 @@ public class ParameterHandler {
 		} else if (parameterClass == Boolean.class) {
 			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
 			parameter.setValue(Boolean.parseBoolean(valueString));
+		} else if (parameterClass == Double.class) {
+			System.out.println("setting " + parameter.getClass().getSimpleName() + " to " + valueString);
+			parameter.setValue(Double.parseDouble(valueString));
 		}
 	}
 
