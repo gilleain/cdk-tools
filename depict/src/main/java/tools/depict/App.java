@@ -8,8 +8,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +16,8 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.cli.ParseException;
-import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.io.ISimpleChemObjectReader;
-import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.IRenderer;
@@ -35,7 +29,9 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.generators.IGeneratorParameter;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+
+import tools.core.InputHandler;
+import tools.core.OutputHandler;
 
 /**
  * CDK-Tools IO main application class, used for converting between file formats.
@@ -59,63 +55,43 @@ public class App {
 					ParameterHandler.getParamNameMap(generators);
 			ParameterHandler.applyParameters(parameterNameMap, arguments.getImageProperties());
 			
-			String inputFormat = arguments.getInputFormat();
-			String outputFormat = arguments.getOutputFormat();
-			
-			String inputFilename = arguments.getInputFilename();
-			String outputFilename = arguments.getOutputFilename();
-			
-			List<IAtomContainer> inputAtomContainers = null;
-			if (inputFilename == null) {
-				arguments.missingInputFilename();
-				return;
+			InputHandler input = arguments.getInputHandler();
+			if (input.getInputMode() == InputHandler.InputMode.SINGLE) {
+				IAtomContainer atomContainer = input.getSingleInput();
+				action(atomContainer, arguments);
 			} else {
-				if (inputFormat == null) {
-					// use o.o.cdk.io.FormatFactory?
-				} else {
-					ISimpleChemObjectReader reader = null;
-					if (inputFormat.equals("MDL")) {
-						try {
-							reader = new MDLV2000Reader(new FileReader(new File(inputFilename)));
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-							return;
-						}
-					}
-					try {
-						IChemFile chemFile = reader.read(new ChemFile());
-						inputAtomContainers = ChemFileManipulator.getAllAtomContainers(chemFile);
-					} catch (CDKException e) {
-						e.printStackTrace();
-						return;
-					}
+				List<IAtomContainer> inputAtomContainers = input.getMultipleInputs();
+				for (IAtomContainer atomContainer : inputAtomContainers) {
+					action(atomContainer, arguments);
 				}
 			}
-			if (inputAtomContainers != null) {
-				if (outputFormat.equals("PNG")) {
-					try {
-						for (IAtomContainer atomContainer : inputAtomContainers) {
-							
-							// XXX - this highlights all the containers with the same matches!
-							highlightAtoms(atomContainer, arguments.getMatchedAtoms());
-							
-							atomContainer = makeDiagram(atomContainer);
-							IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(
-									generators, new AWTFontManager());
-							Image image = draw(atomContainer, renderer, arguments);
-							ImageIO.write(
-									(RenderedImage) image, "PNG", new File(outputFilename));
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (CDKException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			
 		} catch (ParseException e) {
 			System.err.println(e);
 		}
+	}
+	
+	private static void action(IAtomContainer atomContainer, ArgumentHandler arguments) {
+		OutputHandler output = arguments.getOutputHandler();
+		String outputFormat = output.getOutputFormat();
+		String outputFilename = output.getOutputFilename();
+		List<IGenerator<IAtomContainer>> generators = makeGenerators();
+		try {
+			// XXX - this highlights all the containers with the same matches!
+			highlightAtoms(atomContainer, arguments.getMatchedAtoms());
+
+			atomContainer = makeDiagram(atomContainer);
+			IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(
+					generators, new AWTFontManager());
+			Image image = draw(atomContainer, renderer, arguments);
+			if (outputFormat.equals("PNG")) {
+				ImageIO.write((RenderedImage) image, "PNG", new File(outputFilename));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CDKException e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	private static void highlightAtoms(IAtomContainer atomContainer, List<Integer> matches) {

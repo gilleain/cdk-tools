@@ -56,17 +56,7 @@
         <artifactId>cdk-renderawt</artifactId>
         <version>${cdk.version}</version>
      </dependency>
-	<dependency>
-        <groupId>org.openscience.cdk</groupId>
-        <artifactId>cdk-smiles</artifactId>
-        <version>${cdk.version}</version>
-    </dependency>
     <dependency>
-        <groupId>org.openscience.cdk</groupId>
-        <artifactId>cdk-data</artifactId>
-        <version>${cdk.version}</version>
-    </dependency>
-        <dependency>
         <groupId>org.openscience.cdk-tools</groupId>
         <artifactId>core</artifactId>
         <version>0.0.1-SNAPSHOT</version>

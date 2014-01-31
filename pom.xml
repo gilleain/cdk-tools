@@ -22,6 +22,7 @@
   	<module>convert</module>
   	<module>depict</module>
   	<module>core</module>
+  	<module>match</module>
   </modules>
   
    <dependencies>
