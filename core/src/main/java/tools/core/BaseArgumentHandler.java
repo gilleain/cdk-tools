@@ -1,5 +1,7 @@
 package tools.core;
 
+import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
@@ -18,9 +20,9 @@ public class BaseArgumentHandler {
 	
 	private CommandLine commandLine;
 	
-	private InputHandler inputHandler;
-	
 	private OutputHandler outputHandler;
+	
+	private Map<String, InputHandler> inputHandlers;
 
 	@SuppressWarnings("static-access")
 	public BaseArgumentHandler(String[] args) {
@@ -58,11 +60,13 @@ public class BaseArgumentHandler {
 		commandLine = parser.parse(options, args, stopAtNonOption);
 		
 		if (commandLine.hasOption('i')) {
-			inputHandler.setInputFilename(commandLine.getOptionValue('i'));
-		}
-		
-		if (commandLine.hasOption('I')) {
-			inputHandler.setInputFormat(commandLine.getOptionValue('I'));
+			String dataValue = commandLine.getOptionValue('i');
+			if (commandLine.hasOption('I')) {
+				String typeValue = commandLine.getOptionValue('I');
+				addInputHandler("i", dataValue, typeValue);
+			} else {
+				// ? use default, or throw errors.
+			}
 		}
 		
 		if (commandLine.hasOption('o')) {
@@ -84,6 +88,25 @@ public class BaseArgumentHandler {
 	}
 	
 	public InputHandler getInputHandler() {
+		return getInputHandler("i");
+	}
+	public InputHandler getInputHandler(String option) {
+		if (inputHandlers.containsKey(option)) {
+			return inputHandlers.get(option);
+		}
+		return null;	// TODO : error/message
+	}
+	
+	public void addInputHandler(
+			String option, String dataValue, String typeValue) {
+		this.inputHandlers.put(option, 
+				makeInputHandler(dataValue, typeValue));
+	}
+	
+	private InputHandler makeInputHandler(String dataValue, String typeValue) {
+		InputHandler inputHandler = new InputHandler();
+		inputHandler.setInputFilename(dataValue);
+		inputHandler.setInputFormat(typeValue);
 		return inputHandler;
 	}
 	
