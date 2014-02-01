@@ -37,13 +37,14 @@ public class InputHandler {
 	}
 
 	public InputMode getInputMode() {
+		if (mode == null) {
+			mode = getMode(inputFormat);
+		}
 		return mode;
 	}
 	
 	public IAtomContainer getSingleInput() {
-		if (mode == null) {
-			mode = getMode(inputFormat);
-		}
+		
 		
 		if (inputFilename == null) {
 			return null;
@@ -87,11 +88,18 @@ public class InputHandler {
 	}
 	
 	private InputMode getMode(String inputFormat) {
-		if (singleFormats.contains(inputFormat)) {
-			return InputMode.SINGLE;
-		} else {
-			return InputMode.MULTIPLE;	// TODO
+		// XXX -why doesn't the contains method work here?
+//		if (singleFormats.contains(inputFormat)) {
+//			return InputMode.SINGLE;
+//		} else {
+//			return InputMode.MULTIPLE;	// TODO
+//		}
+		for (String format : singleFormats) {
+			if (format.equals(inputFormat)) {
+				return InputMode.SINGLE;
+			}
 		}
+		return InputMode.MULTIPLE;	// TODO
 	}
 	
 	public String getInputFormat() {

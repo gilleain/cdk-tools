@@ -1,5 +1,6 @@
 package tools.core;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
@@ -52,6 +53,8 @@ public class BaseArgumentHandler {
 						 .withArgName("filepath")
 						 .withDescription("Output filename")
 						 .create('O'));
+		
+		this.inputHandlers = new HashMap<String, InputHandler>();
 	}
 	
 	public CommandLine parse(String[] args) throws ParseException {

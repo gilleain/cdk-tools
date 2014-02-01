@@ -1,13 +1,13 @@
 package tools.match;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
-import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
-import org.openscience.cdk.isomorphism.mcss.RMap;
+import org.openscience.cdk.isomorphism.Pattern;
+import org.openscience.cdk.smsd.labelling.AtomContainerPrinter;
 
 import tools.core.InputHandler;
 
@@ -31,9 +31,9 @@ public class App {
 			InputHandler targetInput = arguments.getTargetInputHandler();
 
 			if (queryInput.getInputMode() == InputHandler.InputMode.SINGLE) {
-				IQueryAtomContainer queryAtomContainer = (IQueryAtomContainer)queryInput.getSingleInput();
+				IAtomContainer queryAtomContainer = queryInput.getSingleInput();
 				if (targetInput.getInputMode() == InputHandler.InputMode.SINGLE) {
-					IAtomContainer targetAtomContainer = queryInput.getSingleInput();
+					IAtomContainer targetAtomContainer = targetInput.getSingleInput();
 					action(queryAtomContainer, targetAtomContainer, arguments);
 				} else {
 					List<IAtomContainer> targetAtomContainers = targetInput.getMultipleInputs();
@@ -43,6 +43,7 @@ public class App {
 				}
 			} else {
 				// XXX - are multiple queries allowed?
+				System.err.println("Multiple queries not allowed");
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -51,14 +52,17 @@ public class App {
 		}
 	}
 	
-	private static void action(IQueryAtomContainer queryAtomContainer,
+	private static void action(IAtomContainer queryAtomContainer,
 							   IAtomContainer targetAtomContainer,
 							   ArgumentHandler arguments) throws CDKException {
-		UniversalIsomorphismTester tester = new UniversalIsomorphismTester();
-		List<RMap> rmap = tester.getIsomorphAtomsMap(
-				queryAtomContainer, targetAtomContainer);
-		for (RMap mapping : rmap) {
-				System.out.println(mapping.getId1() + "->" + mapping.getId2());
+		
+		AtomContainerPrinter acp = new AtomContainerPrinter();
+		System.out.println(acp.toString(queryAtomContainer));
+		System.out.println(acp.toString(targetAtomContainer));
+		
+		Pattern pattern = Pattern.findSubstructure(queryAtomContainer);
+		for (int[] p : pattern.matchAll(targetAtomContainer)) {
+			System.out.println(Arrays.toString(p));
 		}
 	}
 

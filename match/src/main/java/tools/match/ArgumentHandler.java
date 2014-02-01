@@ -24,6 +24,17 @@ public class ArgumentHandler extends BaseArgumentHandler {
 				OptionBuilder.hasArg()
 							 .withArgName("target")
 							 .create('t'));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withArgName("query type")
+							 .create('Q'));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withArgName("target type")
+							 .create('T'));
+		
 		CommandLine commandLine = super.parse(args);
 		
 		if (commandLine.hasOption('q')) {
