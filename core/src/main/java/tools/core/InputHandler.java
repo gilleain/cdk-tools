@@ -12,6 +12,7 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
+import org.openscience.cdk.io.SMILESReader;
 
 /**
  * Common methods for all apps to access the input molecules.
@@ -34,6 +35,7 @@ public class InputHandler {
 	public InputHandler() {
 		mode = null;
 		singleFormats.add("MDL");
+		singleFormats.add("SMI");
 	}
 
 	public InputMode getInputMode() {
@@ -45,21 +47,24 @@ public class InputHandler {
 	
 	public IAtomContainer getSingleInput() {
 		
-		
 		if (inputFilename == null) {
 			return null;
 		} else {
 			if (inputFormat == null) {
 				// use o.o.cdk.io.FormatFactory?
 			} else {
+				FileReader fileReader;
+				try {
+					fileReader = new FileReader(new File(inputFilename));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					return null;
+				} 
 				ISimpleChemObjectReader reader = null;
 				if (inputFormat.equals("MDL")) {
-					try {
-						reader = new MDLV2000Reader(new FileReader(new File(inputFilename)));
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-						return null;
-					}
+					reader = new MDLV2000Reader(fileReader);
+				} else if (inputFormat.equals("SMI")) {
+					reader = new SMILESReader(fileReader);
 				}
 				try {
 					try {

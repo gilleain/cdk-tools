@@ -1,10 +1,11 @@
 package tools.match;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Pattern;
 import org.openscience.cdk.smsd.labelling.AtomContainerPrinter;
@@ -61,8 +62,17 @@ public class App {
 		System.out.println(acp.toString(targetAtomContainer));
 		
 		Pattern pattern = Pattern.findSubstructure(queryAtomContainer);
-		for (int[] p : pattern.matchAll(targetAtomContainer)) {
-			System.out.println(Arrays.toString(p));
+		int matchCount = 0;
+		for (Map<IAtom, IAtom> atomMap : pattern.matchAll(targetAtomContainer).toAtomMap()) {
+			for (IAtom pAtom : atomMap.keySet()) {
+				System.out.print(
+						matchCount 
+						+ " : " + queryAtomContainer.getAtomNumber(pAtom)
+						+ " -> " + targetAtomContainer.getAtomNumber(atomMap.get(pAtom))
+						+ ", ");
+			}
+			System.out.println();
+			matchCount++;
 		}
 	}
 
