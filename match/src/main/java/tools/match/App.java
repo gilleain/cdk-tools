@@ -64,10 +64,10 @@ public class App {
 		Pattern pattern = Pattern.findSubstructure(queryAtomContainer);
 		int matchCount = 0;
 		for (Map<IAtom, IAtom> atomMap : pattern.matchAll(targetAtomContainer).toAtomMap()) {
+			System.out.print(matchCount + " : ");
 			for (IAtom pAtom : atomMap.keySet()) {
 				System.out.print(
-						matchCount 
-						+ " : " + queryAtomContainer.getAtomNumber(pAtom)
+						queryAtomContainer.getAtomNumber(pAtom)
 						+ " -> " + targetAtomContainer.getAtomNumber(atomMap.get(pAtom))
 						+ ", ");
 			}
