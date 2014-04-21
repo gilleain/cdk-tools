@@ -57,7 +57,7 @@ public class App {
 		String outputFormat = output.getOutputFormat();
 		try {
 			Writer writer;
-			if (outputFilename.equals("-")) {
+			if (outputFilename == null || outputFilename.equals("-")) {
 				writer = new PrintWriter(System.out);
 			} else {
 				writer = new BufferedWriter(
