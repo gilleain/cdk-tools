@@ -11,18 +11,30 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	
 	private boolean makeSingleRandomStructure = false;
 	
+	private int limitToGenerate = 50;
+	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
 		Options options = super.getOptions();
 		options.addOption(
-				OptionBuilder.withDescription("Single random structure")
+				OptionBuilder.withDescription("Random structure(s)")
 							 .create('r'));
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withDescription("Limiting number")
+							 .create('l'));
 		
 		CommandLine commandLine = super.parse(args);
 		
 		if (commandLine.hasOption('r')) {
-			System.out.println("generating single structure");
+			System.out.println("generating random structures");
 			setMakeSingleRandomStructure(true);
+		}
+		
+		if (commandLine.hasOption('l')) {
+			int limit = Integer.parseInt(commandLine.getOptionValue('l'));
+			System.out.println("limiting to " + limit);
+			setLimitToGenerate(limit);
 		}
 	}
 
@@ -32,6 +44,14 @@ public class ArgumentHandler extends BaseArgumentHandler {
 
 	public void setMakeSingleRandomStructure(boolean makeSingleRandomStructure) {
 		this.makeSingleRandomStructure = makeSingleRandomStructure;
+	}
+
+	public int getLimitToGenerate() {
+		return limitToGenerate;
+	}
+
+	public void setLimitToGenerate(int limitToGenerate) {
+		this.limitToGenerate = limitToGenerate;
 	}
 	
 }

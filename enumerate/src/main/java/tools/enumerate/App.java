@@ -9,10 +9,8 @@ import java.io.Writer;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.structgen.SingleStructureRandomGenerator;
@@ -64,21 +62,29 @@ public class App {
 										new FileWriter(
 											new File(outputFilename)));
 			}
+			
+			int limit = arguments.getLimitToGenerate();
 			if (outputFormat.equals("SMI")) {
 				SmilesGenerator smilesGenerator = SmilesGenerator.unique();
-				transform(atomContainer, arguments);
-				String smiles = smilesGenerator.create(atomContainer);
-				writer.write(smiles);
-				writer.write(NEW_LINE);
-				writer.flush();
+				for (int count = 0; count < limit; count++) {
+//					System.out.println("generating number " + count);
+					transform(atomContainer, arguments);
+					String smiles = smilesGenerator.create(atomContainer);
+					writer.write(smiles);
+					writer.write(NEW_LINE);
+					writer.flush();
+				}
 				writer.close();
 			} else if (outputFormat.equals("MDL")) {
 				MDLV2000Writer mdlWriter = new MDLV2000Writer(writer);
-				transform(atomContainer, arguments);
-				try {
-					mdlWriter.writeMolecule(atomContainer);
-				} catch (Exception e) {
-					// seriously.. ?
+				for (int count = 0; count < limit; count++) {
+//					System.out.println("generating number " + count);
+					transform(atomContainer, arguments);
+					try {
+						mdlWriter.writeMolecule(atomContainer);
+					} catch (Exception e) {
+						// seriously.. ?
+					}
 				}
 				mdlWriter.close();
 			}
@@ -92,7 +98,7 @@ public class App {
 	private static IAtomContainer transform(IAtomContainer atomContainer, ArgumentHandler args) throws CDKException {
 		if (args.getMakeSingleRandomStructure()) {
 			try {
-				SingleStructureRandomGenerator generator = new SingleStructureRandomGenerator();
+				SingleStructureRandomGenerator generator = new SingleStructureRandomGenerator(System.currentTimeMillis());
 				generator.setAtomContainer(atomContainer);
 				return generator.generate();
 			} catch (Exception e) {
