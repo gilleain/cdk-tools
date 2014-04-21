@@ -31,27 +31,27 @@ public class BaseArgumentHandler {
 		options.addOption("h", "help", false, "Command usage");
 		options.addOption(
 			OptionBuilder.hasArg()
-						 .withArgName("type")
-						 .withDescription("Input type")
+						 .withArgName("filepath")
+						 .withDescription("Input filename")
 						 .create('i'));
 		
 		options.addOption(
 			OptionBuilder.hasArg()
-						 .withArgName("filepath")
-						 .withDescription("Input filename")
+						 .withArgName("type")
+						 .withDescription("Input type")
 						 .create('I'));
 		
 		
 		options.addOption(
 			OptionBuilder.hasArg()
-						 .withArgName("type")
-						 .withDescription("Output type")
+						 .withArgName("filepath")
+						 .withDescription("Output filename")
 						 .create('o'));
 		
 		options.addOption(
 			OptionBuilder.hasArg()
-						 .withArgName("filepath")
-						 .withDescription("Output filename")
+						 .withArgName("type")
+  		   				 .withDescription("Output type")
 						 .create('O'));
 		
 		this.inputHandlers = new HashMap<String, InputHandler>();
