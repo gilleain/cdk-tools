@@ -13,7 +13,6 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
-		super(args);
 		Options options = super.getOptions();
 		options.addOption(
 				OptionBuilder.withDescription("Add hydrogens")

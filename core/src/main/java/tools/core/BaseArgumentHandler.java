@@ -23,10 +23,14 @@ public class BaseArgumentHandler {
 	
 	private OutputHandler outputHandler;
 	
+	/**
+	 * Argument handlers for individual modules may use different options for input,
+	 * for example see {@link tools.match.ArgumentHandler}.
+	 */
 	private Map<String, InputHandler> inputHandlers;
 
 	@SuppressWarnings("static-access")
-	public BaseArgumentHandler(String[] args) {
+	public BaseArgumentHandler() {
 		options = new Options();
 		options.addOption("h", "help", false, "Command usage");
 		options.addOption(
@@ -55,6 +59,7 @@ public class BaseArgumentHandler {
 						 .create('O'));
 		
 		this.inputHandlers = new HashMap<String, InputHandler>();
+		this.outputHandler = new OutputHandler();
 	}
 	
 	public CommandLine parse(String[] args) throws ParseException {
@@ -90,9 +95,21 @@ public class BaseArgumentHandler {
 		System.err.println("Please supply an input filename with -I");
 	}
 	
+	/**
+	 * Get the default input handler for the option '-i'.
+	 * 
+	 * @return the input handler for -i
+	 */
 	public InputHandler getInputHandler() {
 		return getInputHandler("i");
 	}
+	
+	/**
+	 * Get the input handler for the specific option value.
+	 * 
+	 * @param option the command-line option related to this input
+	 * @return
+	 */
 	public InputHandler getInputHandler(String option) {
 		if (inputHandlers.containsKey(option)) {
 			return inputHandlers.get(option);
