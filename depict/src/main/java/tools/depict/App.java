@@ -1,6 +1,7 @@
 package tools.depict;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -32,9 +33,11 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 
 import tools.core.InputHandler;
 import tools.core.OutputHandler;
+import tools.depict.layout.GridLayout;
+import tools.depict.layout.LayoutMethod;
 
 /**
- * CDK-Tools IO main application class, used for converting between file formats.
+ * CDK-Tools 'depict' main application class, used for drawing molecules.
  * 
  * @author maclean
  *
@@ -58,11 +61,16 @@ public class App {
 			InputHandler input = arguments.getInputHandler();
 			if (input.getInputMode() == InputHandler.InputMode.SINGLE) {
 				IAtomContainer atomContainer = input.getSingleInput();
-				action(atomContainer, arguments);
+				drawAtomContainer(atomContainer, arguments);
 			} else {
 				List<IAtomContainer> inputAtomContainers = input.getMultipleInputs();
-				for (IAtomContainer atomContainer : inputAtomContainers) {
-					action(atomContainer, arguments);
+				LayoutMethod layoutMethod = arguments.getLayoutMethod();
+				if (layoutMethod == LayoutMethod.SINGLE) {
+					for (IAtomContainer atomContainer : inputAtomContainers) {
+						drawAtomContainer(atomContainer, arguments);
+					}
+				} else {
+					drawMultipleAtomContainers(inputAtomContainers, arguments);
 				}
 			}
 			
@@ -71,7 +79,40 @@ public class App {
 		}
 	}
 	
-	private static void action(IAtomContainer atomContainer, ArgumentHandler arguments) {
+	private static void drawMultipleAtomContainers(List<IAtomContainer> atomContainers, ArgumentHandler arguments) {
+		LayoutMethod layoutMethod = arguments.getLayoutMethod();
+		List<IGenerator<IAtomContainer>> generators = makeGenerators();
+		IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(generators, new AWTFontManager());
+		int w = 500;
+		int h = 500;
+		RendererModel model = renderer.getRenderer2DModel();
+		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
+		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics graphics = image.getGraphics();
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, w, h);
+		if (layoutMethod == LayoutMethod.GRID) {
+			GridLayout layout = new GridLayout(5, 5, 10, 10, 10);	// XXX - magic numbers!
+			layout.layout(atomContainers, new Dimension(50, 50), (Graphics2D)graphics);
+			for (IAtomContainer atomContainer : atomContainers) {
+				renderer.setup(atomContainer, new Rectangle(w, h));
+				renderer.paint(atomContainer, new AWTDrawVisitor((Graphics2D) graphics));
+			}
+		}
+		
+		OutputHandler output = arguments.getOutputHandler();
+		String outputFormat = output.getOutputFormat();
+		String outputFilename = output.getOutputFilename();
+		try {
+			if (outputFormat.equals("PNG")) {
+				ImageIO.write((RenderedImage) image, "PNG", new File(outputFilename));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void drawAtomContainer(IAtomContainer atomContainer, ArgumentHandler arguments) {
 		OutputHandler output = arguments.getOutputHandler();
 		String outputFormat = output.getOutputFormat();
 		String outputFilename = output.getOutputFilename();
@@ -81,8 +122,7 @@ public class App {
 			highlightAtoms(atomContainer, arguments.getMatchedAtoms());
 
 			atomContainer = makeDiagram(atomContainer);
-			IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(
-					generators, new AWTFontManager());
+			IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(generators, new AWTFontManager());
 			Image image = draw(atomContainer, renderer, arguments);
 			if (outputFormat.equals("PNG")) {
 				ImageIO.write((RenderedImage) image, "PNG", new File(outputFilename));
@@ -125,7 +165,6 @@ public class App {
 							  ArgumentHandler arguments) {
 		int w = 500;
 		int h = 500;
-		
 		
 		RendererModel model = renderer.getRenderer2DModel();
 		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);

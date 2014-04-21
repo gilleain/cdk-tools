@@ -13,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import tools.core.BaseArgumentHandler;
+import tools.depict.layout.LayoutMethod;
 
 public class ArgumentHandler extends BaseArgumentHandler {
 	
@@ -23,6 +24,8 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	private boolean isImagePropertiesHelp;
 	
 	private List<Integer> matchedAtoms;
+	
+	private LayoutMethod layoutMethod;
 	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
@@ -42,6 +45,12 @@ public class ArgumentHandler extends BaseArgumentHandler {
 				OptionBuilder.hasArg()
 							 .withArgName("matched atoms")
 							 .create('m'));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withArgName("layout method")
+							 .withLongOpt("layout")
+							 .create("l"));
 		
 		CommandLine commandLine = super.parse(args);
 		
@@ -89,6 +98,13 @@ public class ArgumentHandler extends BaseArgumentHandler {
 		} else {
 			setMatchedAtoms(new ArrayList<Integer>());
 		}
+		
+		if (commandLine.hasOption("l")) {
+			String layoutOption = commandLine.getOptionValue('l', "SINGLE");
+			// XXX Downside of this approach is the need for ALL CAPS in the layout method..
+			LayoutMethod selectedMethod = LayoutMethod.valueOf(layoutOption);
+			setLayoutMethod(selectedMethod);
+		}
 	}
 	
 	public void setImageProperties(Properties imageProperties) {
@@ -121,6 +137,14 @@ public class ArgumentHandler extends BaseArgumentHandler {
 
 	public void setMatchedAtoms(List<Integer> matchedAtoms) {
 		this.matchedAtoms = matchedAtoms;
+	}
+
+	public LayoutMethod getLayoutMethod() {
+		return layoutMethod;
+	}
+
+	public void setLayoutMethod(LayoutMethod layoutMethod) {
+		this.layoutMethod = layoutMethod;
 	}
 
 }
