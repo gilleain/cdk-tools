@@ -1,4 +1,4 @@
-package tools.convert;
+package tools.enumerate;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,14 +15,13 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.tools.CDKHydrogenAdder;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+import org.openscience.cdk.structgen.SingleStructureRandomGenerator;
 
 import tools.core.InputHandler;
 import tools.core.OutputHandler;
 
 /**
- * CDK-Tools IO main application class, used for converting between file formats.
+ * CDK-Tools enumerate main application class, for listing structures.
  * 
  * @author maclean
  *
@@ -90,14 +89,18 @@ public class App {
 		}
 	}
 	
-	private static void transform(IAtomContainer atomContainer, ArgumentHandler args) throws CDKException {
-		if (args.shouldAddHydrogens()) {
-			IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
-			AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(atomContainer);
-			CDKHydrogenAdder.getInstance(builder)
-					.addImplicitHydrogens(atomContainer);
-			AtomContainerManipulator.convertImplicitToExplicitHydrogens(atomContainer);
+	private static IAtomContainer transform(IAtomContainer atomContainer, ArgumentHandler args) throws CDKException {
+		if (args.getMakeSingleRandomStructure()) {
+			try {
+				SingleStructureRandomGenerator generator = new SingleStructureRandomGenerator();
+				generator.setAtomContainer(atomContainer);
+				return generator.generate();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		return null;
 	}
 
 }

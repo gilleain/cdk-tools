@@ -1,4 +1,4 @@
-package tools.convert;
+package tools.enumerate;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -9,30 +9,30 @@ import tools.core.BaseArgumentHandler;
 
 public class ArgumentHandler extends BaseArgumentHandler {
 	
-	private boolean shouldAddHydrogens = false;
+	private boolean makeSingleRandomStructure = false;
 	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
 		super(args);
 		Options options = super.getOptions();
 		options.addOption(
-				OptionBuilder.withDescription("Add hydrogens")
-							 .create('a'));
+				OptionBuilder.withDescription("Single random structure")
+							 .create('r'));
 		
 		CommandLine commandLine = super.parse(args);
 		
-		if (commandLine.hasOption('a')) {
-			System.out.println("adding hydrogens");
-			setShouldAddHydrogens(true);
+		if (commandLine.hasOption('r')) {
+			System.out.println("generating single structure");
+			setMakeSingleRandomStructure(true);
 		}
 	}
 
-	public boolean shouldAddHydrogens() {
-		return shouldAddHydrogens;
+	public boolean getMakeSingleRandomStructure() {
+		return makeSingleRandomStructure;
 	}
 
-	public void setShouldAddHydrogens(boolean shouldAddHydrogens) {
-		this.shouldAddHydrogens = shouldAddHydrogens;
+	public void setMakeSingleRandomStructure(boolean makeSingleRandomStructure) {
+		this.makeSingleRandomStructure = makeSingleRandomStructure;
 	}
 	
 }
