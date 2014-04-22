@@ -33,30 +33,32 @@ public class BaseArgumentHandler {
 	public BaseArgumentHandler() {
 		options = new Options();
 		options.addOption("h", "help", false, "Command usage");
+		
+		// Note "I/O" and "i/o" for files and types respectively, following openbabel
 		options.addOption(
 			OptionBuilder.hasArg()
 						 .withArgName("filepath")
 						 .withDescription("Input filename")
-						 .create('i'));
+						 .create('I'));
 		
 		options.addOption(
 			OptionBuilder.hasArg()
 						 .withArgName("type")
 						 .withDescription("Input type")
-						 .create('I'));
+						 .create('i'));
 		
 		
 		options.addOption(
 			OptionBuilder.hasArg()
 						 .withArgName("filepath")
 						 .withDescription("Output filename")
-						 .create('o'));
+						 .create('O'));
 		
 		options.addOption(
 			OptionBuilder.hasArg()
 						 .withArgName("type")
   		   				 .withDescription("Output type")
-						 .create('O'));
+						 .create('o'));
 		
 		this.inputHandlers = new HashMap<String, InputHandler>();
 		this.outputHandler = new OutputHandler();
@@ -67,22 +69,22 @@ public class BaseArgumentHandler {
 		boolean stopAtNonOption = true;
 		commandLine = parser.parse(options, args, stopAtNonOption);
 		
-		if (commandLine.hasOption('i')) {
-			String dataValue = commandLine.getOptionValue('i');
-			if (commandLine.hasOption('I')) {
-				String typeValue = commandLine.getOptionValue('I');
+		if (commandLine.hasOption('I')) {
+			String dataValue = commandLine.getOptionValue('I');
+			if (commandLine.hasOption('i')) {
+				String typeValue = commandLine.getOptionValue('i');
 				addInputHandler("i", dataValue, typeValue);
 			} else {
 				// ? use default, or throw errors.
 			}
 		}
 		
-		if (commandLine.hasOption('o')) {
-			outputHandler.setOutputFilename(commandLine.getOptionValue('o'));
+		if (commandLine.hasOption('O')) {
+			outputHandler.setOutputFilename(commandLine.getOptionValue('O'));
 		}
 		
-		if (commandLine.hasOption('O')) {
-			outputHandler.setOutputFormat(commandLine.getOptionValue('O'));
+		if (commandLine.hasOption('o')) {
+			outputHandler.setOutputFormat(commandLine.getOptionValue('o'));
 		}
 		return commandLine;
 	}

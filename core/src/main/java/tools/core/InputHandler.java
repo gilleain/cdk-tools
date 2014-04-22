@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.SMILESReader;
+import org.openscience.cdk.io.iterator.IIteratingChemObjectReader;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
 /**
  * Common methods for all apps to access the input molecules.
@@ -22,7 +26,7 @@ import org.openscience.cdk.io.SMILESReader;
  */
 public class InputHandler {
 	
-	public enum InputMode { SINGLE, MULTIPLE };
+	public enum InputMode { UNKNOWN, SINGLE, MULTIPLE };
 	
 	private InputMode mode;
 	
@@ -30,12 +34,21 @@ public class InputHandler {
 	
 	private String inputFilename;
 	
+	/**
+	 * The formats that are single molecule per file.
+	 */
 	private List<String> singleFormats = new ArrayList<String>();
+	
+	/**
+	 * Formats that are multiple molecule per file.
+	 */
+	private List<String> multipleFormats = new ArrayList<String>();
 	
 	public InputHandler() {
 		mode = null;
 		singleFormats.add("MDL");
-		singleFormats.add("SMI");
+		multipleFormats.add("SMI");
+		multipleFormats.add("SDF");
 	}
 
 	public InputMode getInputMode() {
@@ -46,7 +59,6 @@ public class InputHandler {
 	}
 	
 	public IAtomContainer getSingleInput() {
-		
 		if (inputFilename == null) {
 			return null;
 		} else {
@@ -89,22 +101,57 @@ public class InputHandler {
 	}
 	
 	public List<IAtomContainer> getMultipleInputs() {
-		return null;	//TODO
+		if (inputFilename == null) {
+			return null;
+		} else {
+			if (inputFormat == null) {
+				// use o.o.cdk.io.FormatFactory?
+			} else {
+				FileReader fileReader;
+				try {
+					fileReader = new FileReader(new File(inputFilename));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					return null;
+				} 
+				IIteratingChemObjectReader<IAtomContainer> reader = null;
+				if (inputFormat.equals("SDF")) {
+					reader = new IteratingSDFReader(fileReader, DefaultChemObjectBuilder.getInstance());
+				} else if (inputFormat.equals("SMI")) {
+					reader = new IteratingSMILESReader(fileReader, DefaultChemObjectBuilder.getInstance());
+				}
+				try {
+					try {
+						List<IAtomContainer> inputs = new ArrayList<IAtomContainer>();
+						while (reader.hasNext()) {
+							inputs.add(reader.next());
+						}
+						return inputs;
+					} finally {
+						reader.close();
+					}
+				} catch (IOException ioe) {
+					// UGH
+					ioe.printStackTrace();
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	private InputMode getMode(String inputFormat) {
-		// XXX -why doesn't the contains method work here?
-//		if (singleFormats.contains(inputFormat)) {
-//			return InputMode.SINGLE;
-//		} else {
-//			return InputMode.MULTIPLE;	// TODO
-//		}
 		for (String format : singleFormats) {
 			if (format.equals(inputFormat)) {
 				return InputMode.SINGLE;
 			}
 		}
-		return InputMode.MULTIPLE;	// TODO
+		for (String format : multipleFormats) {
+			if (format.equals(inputFormat)) {
+				return InputMode.MULTIPLE;
+			}
+		}
+		return InputMode.UNKNOWN;
 	}
 	
 	public String getInputFormat() {
