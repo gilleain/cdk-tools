@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,28 +109,32 @@ public class InputHandler {
 			if (inputFormat == null) {
 				// use o.o.cdk.io.FormatFactory?
 			} else {
-				FileReader fileReader;
+				Reader reader;
 				try {
-					fileReader = new FileReader(new File(inputFilename));
+					if (inputFilename.equals("-")) {
+						reader = new InputStreamReader(System.in);
+					} else {
+						reader = new FileReader(new File(inputFilename));
+					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 					return null;
 				} 
-				IIteratingChemObjectReader<IAtomContainer> reader = null;
+				IIteratingChemObjectReader<IAtomContainer> chemObjectReader = null;
 				if (inputFormat.equals("SDF")) {
-					reader = new IteratingSDFReader(fileReader, DefaultChemObjectBuilder.getInstance());
+					chemObjectReader = new IteratingSDFReader(reader, DefaultChemObjectBuilder.getInstance());
 				} else if (inputFormat.equals("SMI")) {
-					reader = new IteratingSMILESReader(fileReader, DefaultChemObjectBuilder.getInstance());
+					chemObjectReader = new IteratingSMILESReader(reader, DefaultChemObjectBuilder.getInstance());
 				}
 				try {
 					try {
 						List<IAtomContainer> inputs = new ArrayList<IAtomContainer>();
-						while (reader.hasNext()) {
-							inputs.add(reader.next());
+						while (chemObjectReader.hasNext()) {
+							inputs.add(chemObjectReader.next());
 						}
 						return inputs;
 					} finally {
-						reader.close();
+						chemObjectReader.close();
 					}
 				} catch (IOException ioe) {
 					// UGH
