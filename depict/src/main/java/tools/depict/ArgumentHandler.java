@@ -101,8 +101,7 @@ public class ArgumentHandler extends BaseArgumentHandler {
 		
 		if (commandLine.hasOption("l")) {
 			String layoutOption = commandLine.getOptionValue('l', "SINGLE");
-			// XXX Downside of this approach is the need for ALL CAPS in the layout method..
-			LayoutMethod selectedMethod = LayoutMethod.valueOf(layoutOption);
+			LayoutMethod selectedMethod = LayoutMethod.valueOf(layoutOption.toUpperCase());
 			setLayoutMethod(selectedMethod);
 		}
 	}

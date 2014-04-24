@@ -82,22 +82,26 @@ public class App {
 	private static void drawMultipleAtomContainers(List<IAtomContainer> atomContainers, ArgumentHandler arguments) {
 		LayoutMethod layoutMethod = arguments.getLayoutMethod();
 		List<IGenerator<IAtomContainer>> generators = makeGenerators();
+		List<IAtomContainer> laidOutAtomContainers = new ArrayList<IAtomContainer>();
+		for (IAtomContainer atomContainer : atomContainers) {
+			try {
+				laidOutAtomContainers.add(makeDiagram(atomContainer));
+			} catch (CDKException e) {
+				e.printStackTrace();
+			}
+		}
 		IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(generators, new AWTFontManager());
 		int w = 500;
 		int h = 500;
 		RendererModel model = renderer.getRenderer2DModel();
 		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
 		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics graphics = image.getGraphics();
+		Graphics2D graphics = (Graphics2D) image.getGraphics();
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, w, h);
 		if (layoutMethod == LayoutMethod.GRID) {
 			GridLayout layout = new GridLayout(5, 5, 10, 10, 10);	// XXX - magic numbers!
-			layout.layout(atomContainers, new Dimension(50, 50), (Graphics2D)graphics);
-			for (IAtomContainer atomContainer : atomContainers) {
-				renderer.setup(atomContainer, new Rectangle(w, h));
-				renderer.paint(atomContainer, new AWTDrawVisitor((Graphics2D) graphics));
-			}
+			layout.layout(laidOutAtomContainers, renderer, new Dimension(50, 50), graphics);
 		}
 		
 		OutputHandler output = arguments.getOutputHandler();

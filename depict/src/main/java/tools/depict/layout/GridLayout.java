@@ -2,6 +2,7 @@ package tools.depict.layout;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -10,6 +11,8 @@ import javax.vecmath.Point2d;
 
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.renderer.IRenderer;
+import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 
 public class GridLayout {
 
@@ -31,19 +34,25 @@ public class GridLayout {
 		this.borderY = borderY;
 	}
 
-	public void layout(List<IAtomContainer> mols, Dimension cellCanvas, Graphics2D g) {
+	public void layout(List<IAtomContainer> mols, 
+					   IRenderer<IAtomContainer> renderer,
+					   Dimension cellCanvas, Graphics2D g) {
 		AffineTransform originalTransform = g.getTransform();
 		double w = cellCanvas.width;
 		double h = cellCanvas.height;
 
-		double centerX = w / 2;
-		double centerY = h / 2;
+		double w2 = w / 2;
+		double h2 = h / 2;
+		double centerX = w2;
+		double centerY = h2;
 		int colCounter = 1;
 		for (IAtomContainer mol : mols) {
 			double zoom = calculateZoom(mol, cellCanvas);
-			g.translate(centerX, centerY);
-			g.scale(zoom, zoom);
-			g.setTransform(originalTransform);
+//			g.translate(centerX, centerY);
+//			g.scale(zoom, zoom);
+			Rectangle2D bounds = new Rectangle2D.Double(centerX - w2, centerY - h2, w, h);
+			renderer.paint(mol, new AWTDrawVisitor(g), bounds, false);
+//			g.setTransform(originalTransform);
 			if (colCounter < cols) {
 				centerX += w;
 				colCounter++;
