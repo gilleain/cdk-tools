@@ -34,6 +34,7 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import tools.core.InputHandler;
 import tools.core.OutputHandler;
 import tools.depict.layout.GridLayout;
+import tools.depict.layout.LayoutFactory;
 import tools.depict.layout.LayoutMethod;
 
 /**
@@ -99,10 +100,17 @@ public class App {
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, w, h);
+		GridLayout layout = null;
 		if (layoutMethod == LayoutMethod.GRID) {
-			GridLayout layout = new GridLayout(5, 5, 10, 10, 10);	// XXX - magic numbers!
-			layout.layout(laidOutAtomContainers, renderer, new Dimension(50, 50), graphics);
+			layout = LayoutFactory.makeGridLayout(atomContainers.size());
+		} else if (layoutMethod == LayoutMethod.HORIZONTAL) {
+			layout = LayoutFactory.makeHorizontalLayout(atomContainers.size());
+		} else if (layoutMethod == LayoutMethod.VERTICAL) {
+			layout = LayoutFactory.makeVerticalLayout(atomContainers.size());
+		} else {
+			throw new IllegalArgumentException("Unkown layout method " + layoutMethod);
 		}
+		layout.layout(laidOutAtomContainers, renderer, new Dimension(50, 50), graphics);
 		
 		OutputHandler output = arguments.getOutputHandler();
 		String outputFormat = output.getOutputFormat();
