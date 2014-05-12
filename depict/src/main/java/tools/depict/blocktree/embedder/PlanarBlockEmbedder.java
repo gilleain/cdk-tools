@@ -36,7 +36,7 @@ public class PlanarBlockEmbedder {
      * @return
      */
     public static BlockEmbedding embed(Graph g) {
-        return embed(new Block(g), g);
+        return embed(new Block(g));
     }
     
     public static BlockEmbedding embed(Block blockToEmbed, IAtomContainer atomContainer) {
@@ -51,7 +51,7 @@ public class PlanarBlockEmbedder {
      * @param atomContainer
      * @return
      */
-    public static BlockEmbedding embed(Block blockToEmbed, Graph g) {
+    public static BlockEmbedding embed(Block blockToEmbed) {
 //         System.out.println("embedding block");
         // find a circuit of G
 //        List<Block> cycles = CycleFinder.findAll(blockToEmbed);
@@ -64,7 +64,7 @@ public class PlanarBlockEmbedder {
         Iterator<Block> cycleStream = CycleFinder.getCycleStream(blockToEmbed, true); 
         while (cycleStream.hasNext()) {
             Block cycle = cycleStream.next();
-            BlockEmbedding embedding = embedInCycle(cycle, blockToEmbed, g);
+            BlockEmbedding embedding = embedInCycle(cycle, blockToEmbed);
             if (embedding != null) {
                 return embedding;
             }
@@ -81,12 +81,11 @@ public class PlanarBlockEmbedder {
      * @param atomContainer
      * @return
      */
-    public static BlockEmbedding embedInCycle(
-            Block circuit, Block blockToEmbed, Graph g) {
+    public static BlockEmbedding embedInCycle(Block circuit, Block blockToEmbed) {
         Block currentBlock = circuit;
 
         // make an embedding of the circuit
-        BlockEmbedding embedding = new BlockEmbedding(g, circuit);
+        BlockEmbedding embedding = new BlockEmbedding(circuit);
 
         int faceCount = 1;
         int eulerNumber = blockToEmbed.esize() - blockToEmbed.vsize() + 2;

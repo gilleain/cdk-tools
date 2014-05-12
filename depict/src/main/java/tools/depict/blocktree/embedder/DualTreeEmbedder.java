@@ -27,7 +27,7 @@ public class DualTreeEmbedder {
     
 	public static BlockEmbedding embed(Graph graph, Block outerCycle) {
 //	    System.out.println("Outer cycle " + outerCycle);
-		BlockEmbedding embedding = new BlockEmbedding(graph, outerCycle);
+		BlockEmbedding embedding = new BlockEmbedding(outerCycle);
 		Block b = new Block(graph);    // ugh! re-creating block-graph here
 		
 		// the list of faces

@@ -11,7 +11,6 @@ import tools.depict.blocktree.model.DualEdge;
 import tools.depict.blocktree.model.Face;
 import tools.depict.blocktree.model.Path;
 import tools.depict.blocktree.model.Vertex;
-import tools.depict.blocktree.model.graph.Graph;
 
 
 /**
@@ -22,11 +21,6 @@ import tools.depict.blocktree.model.graph.Graph;
  *
  */
 public class BlockEmbedding {
-	
-	/**
-	 * The underlying graph.
-	 */
-	private Graph graph;
 	
 	/**
 	 * The block that this embedding is of...
@@ -54,16 +48,13 @@ public class BlockEmbedding {
 	 */
 	private List<DualEdge> dualEdges;
 	
-	public BlockEmbedding(Graph graph) {
-		this.graph = graph;
+	public BlockEmbedding() {
 		combinatorialMap = new HashMap<Vertex, List<Vertex>>();
 		faces = new ArrayList<Face>();
 		dualEdges = new ArrayList<DualEdge>();
 	}
 	
-	public BlockEmbedding(Graph graph, Block circuit) {
-		this(graph);
-		
+	public BlockEmbedding(Block circuit) {
 		// this is wrong : if bridges are embedded in external face, this changes 
 		externalFace = embedCircuit(circuit); 
 		faces.add(externalFace);
@@ -164,10 +155,6 @@ public class BlockEmbedding {
 	
 	public Map<Vertex, List<Vertex>> getCM() {
 		return combinatorialMap;
-	}
-	
-	public Graph getGraph() {
-		return graph;
 	}
 
 	public void embedInOuterFace(Path path) {
