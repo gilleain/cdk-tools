@@ -13,6 +13,7 @@ import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.CDKSourceCodeWriter;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
@@ -82,6 +83,13 @@ public class App {
 					// seriously.. ?
 				}
 				mdlWriter.close();
+			} else if (outputFormat.equals("CODE")) {
+				CDKSourceCodeWriter sourceWriter = new CDKSourceCodeWriter(writer);
+				transform(atomContainer, arguments);
+				sourceWriter.write(atomContainer);
+				writer.write(NEW_LINE);
+				writer.flush();
+				sourceWriter.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
