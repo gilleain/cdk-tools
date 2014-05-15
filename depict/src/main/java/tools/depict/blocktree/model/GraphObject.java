@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import tools.depict.blocktree.model.graph.Graph;
 import tools.depict.blocktree.visitor.DFSVisitor;
@@ -55,7 +56,19 @@ public class GraphObject implements Iterable<Vertex> {
 	}
 	
 	public GraphObject(IAtomContainer atomContainer) {
-		// TODO
+		this();
+		
+		for (int index = 0; index < atomContainer.getAtomCount(); index++) {
+			vertices.add(new Vertex(index));
+		}
+		
+		for (IBond bond : atomContainer.bonds()) {
+			// TODO : this is quite inefficient!
+			Vertex v0 = getVertexWithIndex(atomContainer.getAtomNumber(bond.getAtom(0)));
+			Vertex v1 = getVertexWithIndex(atomContainer.getAtomNumber(bond.getAtom(1)));
+			add(v0, v1);
+		}
+		
 	}
 	
 	// XXX - nasty - why are these two classes not unified?
@@ -67,7 +80,7 @@ public class GraphObject implements Iterable<Vertex> {
             usedVertices.set(e.b);
         }
         
-        this.vertices = new ArrayList<Vertex>(); 
+        this.vertices = new ArrayList<Vertex>();
         for (int i = 0; i < graph.getVertexCount(); i++) {
             if (usedVertices.get(i)) {
                 vertices.add(new Vertex(i));
