@@ -55,6 +55,7 @@ public class BlockEmbedding {
 	}
 	
 	public BlockEmbedding(Block circuit) {
+		this();
 		// this is wrong : if bridges are embedded in external face, this changes 
 		externalFace = embedCircuit(circuit); 
 		faces.add(externalFace);

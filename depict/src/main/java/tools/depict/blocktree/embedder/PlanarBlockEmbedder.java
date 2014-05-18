@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
 import tools.depict.blocktree.model.Block;
 import tools.depict.blocktree.model.Bridge;
 import tools.depict.blocktree.model.CycleFinder;
@@ -37,11 +35,6 @@ public class PlanarBlockEmbedder {
      */
     public static BlockEmbedding embed(Graph g) {
         return embed(new Block(g));
-    }
-    
-    public static BlockEmbedding embed(Block blockToEmbed, IAtomContainer atomContainer) {
-    	// TODO
-    	return null;
     }
 
     /**

@@ -46,7 +46,7 @@ public class GraphEmbedder {
         // make the graph embedding
         GraphEmbedding graphEmbedding = new GraphEmbedding(treeBlocks);
         for (Block cycleBlock : cycleBlocks) {
-            graphEmbedding.addBlockEmbedding(PlanarBlockEmbedder.embed(cycleBlock, atomContainer));
+            graphEmbedding.addBlockEmbedding(PlanarBlockEmbedder.embed(cycleBlock));
         }
         
         return graphEmbedding;
