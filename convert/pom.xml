@@ -6,12 +6,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>convert</artifactId>
-  
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdk.version>RELEASE</cdk.version>
-  </properties>
-  
+
   <build>
   	<plugins>
   		<plugin>

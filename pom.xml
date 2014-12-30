@@ -7,16 +7,8 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdk.version>RELEASE</cdk.version>
+    <cdk.version>1.5.10</cdk.version>
   </properties>
-
-  <repositories>
-    <repository>
-        <id>ebi-repo</id>
-        <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
-    </repository>
-  </repositories>
-
   
   <modules>
   	<module>convert</module>

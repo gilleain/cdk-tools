@@ -7,11 +7,6 @@
   </parent>
   <artifactId>enumerate</artifactId>
   
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdk.version>RELEASE</cdk.version>
-  </properties>
-  
   <build>
   	<plugins>
   		<plugin>
