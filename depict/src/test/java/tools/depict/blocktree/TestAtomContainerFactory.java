@@ -1,6 +1,5 @@
 package tools.depict.blocktree;
 
-import org.junit.Test;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -15,7 +14,6 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
  */
 public class TestAtomContainerFactory {
 
-	@Test
 	public static IAtomContainer simpleCycle() {
 		IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
 		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
@@ -38,7 +36,6 @@ public class TestAtomContainerFactory {
 	 * Smiles : C1C(C(C)C)C1
 	 * Isopropyl-cyclopropane.
 	 */
-	@Test
 	public static IAtomContainer cycleWithAttachedTree() {
 		IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
 		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
@@ -72,7 +69,6 @@ public class TestAtomContainerFactory {
 	 * Smiles : C12C3C1N23C
 	 * An unlikely N-methyl hetrotetrahedrane molecule.s
 	 */
-	@Test
 	public static IAtomContainer blockWithSingleVertexTreeAttached() {
 		IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
 		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
