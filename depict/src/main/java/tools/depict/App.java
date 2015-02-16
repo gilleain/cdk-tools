@@ -92,8 +92,8 @@ public class App {
 			}
 		}
 		IRenderer<IAtomContainer> renderer = new AtomContainerRenderer(generators, new AWTFontManager());
-		int w = 500;
-		int h = 500;
+		int w = arguments.getImageWidth() == -1? 500 : arguments.getImageWidth();
+		int h = arguments.getImageHeight() == -1? 500 : arguments.getImageHeight();
 		RendererModel model = renderer.getRenderer2DModel();
 		model.set(BasicSceneGenerator.BackgroundColor.class, Color.WHITE);
 		Image image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
@@ -102,7 +102,11 @@ public class App {
 		graphics.fillRect(0, 0, w, h);
 		GridLayout layout = null;
 		if (layoutMethod == LayoutMethod.GRID) {
-			layout = LayoutFactory.makeGridLayout(atomContainers.size());
+			if (arguments.getRows() != -1 && arguments.getCols() != -1) {
+				layout = LayoutFactory.makeGridLayout(arguments.getRows(), arguments.getCols());
+			} else {
+				layout = LayoutFactory.makeGridLayout(atomContainers.size());
+			}
 		} else if (layoutMethod == LayoutMethod.HORIZONTAL) {
 			layout = LayoutFactory.makeHorizontalLayout(atomContainers.size());
 		} else if (layoutMethod == LayoutMethod.VERTICAL) {
@@ -110,7 +114,13 @@ public class App {
 		} else {
 			throw new IllegalArgumentException("Unkown layout method " + layoutMethod);
 		}
-		layout.layout(laidOutAtomContainers, renderer, new Dimension(50, 50), graphics);
+		Dimension cell;
+		if (arguments.getCellWidth() != -1 && arguments.getCellHeight() != -1) {
+			cell = new Dimension(arguments.getCellWidth(), arguments.getCellHeight());
+		} else {
+			cell = new Dimension(50, 50);
+		}
+		layout.layout(laidOutAtomContainers, renderer, cell, graphics);
 		
 		OutputHandler output = arguments.getOutputHandler();
 		String outputFormat = output.getOutputFormat();

@@ -1,5 +1,6 @@
 package tools.depict;
 
+import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,6 +28,18 @@ public class ArgumentHandler extends BaseArgumentHandler {
 	
 	private LayoutMethod layoutMethod;
 	
+	private int rows;
+	
+	private int cols;
+	
+	private int cellWidth;
+	
+	private int cellHeight;
+	
+	private int imageWidth;
+	
+	private int imageHeight;
+	
 	@SuppressWarnings("static-access")
 	public ArgumentHandler(String[] args) throws ParseException {
 		Options options = super.getOptions();
@@ -51,6 +64,27 @@ public class ArgumentHandler extends BaseArgumentHandler {
 							 .withArgName("layout method")
 							 .withLongOpt("layout")
 							 .create("l"));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withDescription("dimension of the cell WxH")
+							 .withArgName("dimension")
+							 .withLongOpt("dimension")
+							 .create("d"));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withDescription("rows and columns of the grid RxC")
+							 .withArgName("gridDimension")
+							 .withLongOpt("gridDimension")
+							 .create("g"));
+		
+		options.addOption(
+				OptionBuilder.hasArg()
+							 .withDescription("dimension of the image WxH")
+							 .withArgName("imageDimension")
+							 .withLongOpt("imageDimension")
+							 .create("D"));
 		
 		CommandLine commandLine = super.parse(args);
 		
@@ -104,6 +138,38 @@ public class ArgumentHandler extends BaseArgumentHandler {
 			LayoutMethod selectedMethod = LayoutMethod.valueOf(layoutOption.toUpperCase());
 			setLayoutMethod(selectedMethod);
 		}
+		
+		if (commandLine.hasOption("g")) {
+			Dimension d = parseDimesionArg(commandLine, "g");
+			cols = d.width;
+			rows = d.height;
+		}
+		
+		if (commandLine.hasOption("d")) {
+			Dimension d = parseDimesionArg(commandLine, "d");
+			cellWidth = d.width;
+			cellHeight = d.height;
+		}
+		
+		if (commandLine.hasOption("D")) {
+			Dimension d = parseDimesionArg(commandLine, "D");
+			imageWidth = d.width;
+			imageHeight = d.height;
+		}
+	}
+	
+	private Dimension parseDimesionArg(CommandLine commandLine, String option) throws ParseException {
+		String[] dimensionStringValues = commandLine.getOptionValue(option).split("x");
+		Dimension dim = new Dimension();
+		try {
+			dim.height = Integer.parseInt(dimensionStringValues[0]);
+			dim.width = Integer.parseInt(dimensionStringValues[1]);
+		} catch (NumberFormatException nfe) {
+			throw new ParseException("Dimension string invalid " + commandLine.getOptionValue(option));
+		} catch (IndexOutOfBoundsException iiobe) {
+			throw new ParseException("Dimension string invalid " + commandLine.getOptionValue(option));
+		}
+		return dim;
 	}
 	
 	public void setImageProperties(Properties imageProperties) {
@@ -144,6 +210,54 @@ public class ArgumentHandler extends BaseArgumentHandler {
 
 	public void setLayoutMethod(LayoutMethod layoutMethod) {
 		this.layoutMethod = layoutMethod;
+	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public void setRows(int rows) {
+		this.rows = rows;
+	}
+
+	public int getCols() {
+		return cols;
+	}
+
+	public void setCols(int cols) {
+		this.cols = cols;
+	}
+
+	public int getCellWidth() {
+		return cellWidth;
+	}
+
+	public void setCellWidth(int cellWidth) {
+		this.cellWidth = cellWidth;
+	}
+
+	public int getCellHeight() {
+		return cellHeight;
+	}
+
+	public void setCellHeight(int cellHeight) {
+		this.cellHeight = cellHeight;
+	}
+
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	public void setImageWidth(int imageWidth) {
+		this.imageWidth = imageWidth;
+	}
+
+	public int getImageHeight() {
+		return imageHeight;
+	}
+
+	public void setImageHeight(int imageHeight) {
+		this.imageHeight = imageHeight;
 	}
 
 }

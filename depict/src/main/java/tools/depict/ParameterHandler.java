@@ -55,6 +55,7 @@ public class ParameterHandler {
 				}
 				
 				fullNameMap.put(fullClassName, parameter);
+				System.out.println("mapping " + fullClassName + " with default " + parameter.getDefault());
 			}
 		}
 		
@@ -71,12 +72,14 @@ public class ParameterHandler {
 						String packageClassName = packageClassNames.get(0);
 						IGeneratorParameter parameter = fullNameMap.get(packageClassName);
 						paramNameMap.put(innerClassName, parameter);
+						System.out.println("mapping " + innerClassName + " with default " + parameter.getDefault());
 					}
 				}
 			} else {
 				String outerClassName = outerClassNames.get(0);
 				String packageClassName = mediumToFullNameMap.get(outerClassName).get(0); 
 				IGeneratorParameter parameter = fullNameMap.get(packageClassName);
+				System.out.println("mapping " + innerClassName + " with default " + parameter.getDefault());
 				paramNameMap.put(innerClassName, parameter);
 			}
 		}

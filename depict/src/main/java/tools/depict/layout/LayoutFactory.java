@@ -2,6 +2,10 @@ package tools.depict.layout;
 
 public class LayoutFactory {
 	
+	public static GridLayout makeGridLayout(int r, int c) {
+		return new GridLayout(r, c);
+	}
+	
 	public static GridLayout makeGridLayout(int n) {
 		int r = (int) Math.floor(n / 2);
 		int c = n / r;
